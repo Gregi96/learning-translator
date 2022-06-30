@@ -1,20 +1,26 @@
 import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
+type InputProps = {
+    hasError?: boolean
+}
+
 type TextInputProps = {
     disabled?: boolean,
     autoFocus?: boolean,
     placeholder?: string,
     value?: string,
     onChangeText?(newQuery: string): void
+    hasError?: boolean
 }
 
 export const TextInput: React.FunctionComponent<TextInputProps> = ({
     autoFocus,
     disabled,
     placeholder,
-                                                                       value,
-    onChangeText
+    value,
+    onChangeText,
+    hasError
  }) => {
     const InputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -35,14 +41,15 @@ export const TextInput: React.FunctionComponent<TextInputProps> = ({
                     onChangeText(event.target.value)
                 }
             }}
+            hasError={hasError}
         />
     )
 }
 
-const Input = styled.textarea`
+const Input = styled.textarea<InputProps>`
     background-color: ${({theme}) => theme.colors.input};
     color: ${({theme}) => theme.colors.typography};
-    border: none;
+    border: ${({theme, hasError}) => hasError ? `1px solid ${theme.colors.error}` : 'none'};
     border-radius: 8px;
     height: 300px;
     width: 400px;

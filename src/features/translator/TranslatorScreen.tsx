@@ -6,7 +6,7 @@ import { ExchangeLanguage } from 'lib/components/ExchangeLanguage'
 import { AutoDetectedLanguage, Language, LanguageCode } from 'lib/models'
 import { SelectedLanguages } from './types'
 import { APP_CONFIG } from 'lib/config'
-import { useAutoDetectLanguage } from './actions'
+import { useAutoDetectLanguage, useTranslateText } from './actions'
 import { useDebouncedCallback } from 'use-debounce';
 
 type TranslatorScreenProps = {
@@ -17,6 +17,7 @@ export const TranslatorScreen: React.FunctionComponent<TranslatorScreenProps> = 
     languages
 }) => {
     const T = useTranslations()
+    const [translatedText, setTranslatedText] = useState('')
     const [query, setQuery] = useState('')
     const [autoDetectedLanguage, setAutoDetectedLanguage] = useState<AutoDetectedLanguage>()
     const [selectedLanguages, setSelectedLanguages] = useState<SelectedLanguages>({
@@ -28,20 +29,19 @@ export const TranslatorScreen: React.FunctionComponent<TranslatorScreenProps> = 
         hasError: hasErrorDetectingLanguage,
         fetch: autoDetectLanguage
     } = useAutoDetectLanguage(setAutoDetectedLanguage)
-    const debouncedAutoDetectedLanguage = useDebouncedCallback(
+    const {isLoading: isTranslatingText, hasError: hasErrorTranslatingText, fetch: translateText} = useTranslateText(setTranslatedText)
+    const debouncedAction = useDebouncedCallback(
         debouncedQuery => {
             if (debouncedQuery.length < 5) {
                 return
             }
 
-            if (selectedLanguages.source === LanguageCode.Auto) {
-                autoDetectLanguage(debouncedQuery)
-            }
-
+            selectedLanguages.source === LanguageCode.Auto
+                ? autoDetectLanguage(debouncedQuery)
+                : translateText(debouncedQuery, selectedLanguages)
         },
         1000
     )
-
 
     return (
         <Container>
@@ -68,7 +68,7 @@ export const TranslatorScreen: React.FunctionComponent<TranslatorScreenProps> = 
                             }
 
                             setQuery(newQuery)
-                            debouncedAutoDetectedLanguage(newQuery)
+                            debouncedAction(newQuery)
                         }}
                     />
                     {isDetectingLanguage && (
@@ -84,6 +84,7 @@ export const TranslatorScreen: React.FunctionComponent<TranslatorScreenProps> = 
                                     source: autoDetectedLanguage?.language as LanguageCode
                                 }))
                                 setAutoDetectedLanguage(undefined)
+                                debouncedAction(query)
                             }}
                         />
                         <TextCounter
@@ -111,7 +112,12 @@ export const TranslatorScreen: React.FunctionComponent<TranslatorScreenProps> = 
                     />
                     <TextInput
                         disabled
+                        value={translatedText}
+                        hasError={hasErrorTranslatingText}
                     />
+                    {isTranslatingText && (
+                        <Loader />
+                    )}
                 </InputContainer>
             </TranslatorContainer>
         </Container>
