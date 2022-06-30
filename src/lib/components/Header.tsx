@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { useTranslations } from 'lib/hooks'
 import { Images } from 'assets'
-import { AppConfig } from 'lib/config'
+import { APP_CONFIG } from 'lib/config'
 
 export const Header = () => {
     const T = useTranslations()
@@ -17,13 +17,13 @@ export const Header = () => {
             </LogoContainer>
             <LinkContainer>
                 <Link
-                    href={AppConfig.GITHUB_URL}
+                    href={APP_CONFIG.GITHUB_URL}
                     target='_blank'
                 >
                     {T.components.header.github}
                 </Link>
                 <Link
-                    href={AppConfig.DISCORD_URL}
+                    href={APP_CONFIG.DISCORD_URL}
                     target='_blank'
                 >
                     {T.components.header.discord}

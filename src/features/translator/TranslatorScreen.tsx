@@ -1,29 +1,63 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useTranslations } from 'lib/hooks'
-import { Confidence, Loader, SelectLanguage, TextCounter, TextInput } from 'lib/components'
-import { ExchangeLanguage } from '../../lib/components/ExchangeLanguage'
+import { Confidence, SelectLanguage, TextCounter, TextInput } from 'lib/components'
+import { ExchangeLanguage } from 'lib/components/ExchangeLanguage'
+import { Language, LanguageCode } from 'lib/models'
+import { SelectedLanguages } from './types'
 
-export const TranslatorScreen: React.FunctionComponent = () => {
+type TranslatorScreenProps = {
+    languages: Array<Language>
+}
+
+export const TranslatorScreen: React.FunctionComponent<TranslatorScreenProps> = ({
+    languages
+}) => {
     const T = useTranslations()
+    const [selectedLanguages, setSelectedLanguages] = useState<SelectedLanguages>({
+        source: LanguageCode.Polish,
+        target: LanguageCode.English
+    })
 
-    console.log("hookTest", T)
 
     return (
         <Container>
             <TranslatorContainer>
                 <InputContainer>
-                    <SelectLanguage/>
+                    <SelectLanguage
+                        languages={languages}
+                        exclude={[selectedLanguages.target]}
+                        selectedLanguage={selectedLanguages.source}
+                        onChange={(newCode) => setSelectedLanguages( prev => ({
+                            ...prev,
+                            source: newCode
+                        }))}
+
+                    />
                     <TextInput/>
-                    <Loader/>
+                    {/*<Loader/>*/}
                     <InputFooter>
                         <Confidence/>
                         <TextCounter/>
                     </InputFooter>
                 </InputContainer>
-                <ExchangeLanguage/>
+                <ExchangeLanguage
+                    hidden={selectedLanguages.source === LanguageCode.Auto}
+                    onClick={() => setSelectedLanguages(prev => ({
+                        source: prev.target,
+                        target: prev.source
+                    }))}
+                />
                 <InputContainer>
-                    <SelectLanguage/>
+                    <SelectLanguage
+                        languages={languages}
+                        exclude={[selectedLanguages.source, LanguageCode.Auto]}
+                        selectedLanguage={selectedLanguages.target}
+                        onChange={(newCode) => setSelectedLanguages( prev => ({
+                            ...prev,
+                            target: newCode
+                        }))}
+                    />
                     <TextInput/>
                 </InputContainer>
             </TranslatorContainer>

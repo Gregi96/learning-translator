@@ -1,11 +1,25 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import styled from 'styled-components'
+import { Footer } from './Footer'
 
-export const Loader = () => {
+type LoaderProps = {
+    children: React.ReactNode
+}
+
+export const Loader: React.FunctionComponent<LoaderProps> = (
+    {children}
+) => {
+
     return (
-        <ActivityIndicator/>
+        <LoaderContainer>
+            <ActivityIndicator/>
+            <Message>
+                {children}
+            </Message>
+        </LoaderContainer>
     )
 }
+
 
 const ActivityIndicator = styled.div`
     width: 100%;
@@ -23,4 +37,14 @@ const ActivityIndicator = styled.div`
             width: 100%;
         }
     }
+`
+
+const LoaderContainer = styled.div`
+
+`
+
+const Message = styled.div`
+    display: flex;
+    justify-content: center;
+    color: ${({theme}) => theme.colors.typography};
 `
