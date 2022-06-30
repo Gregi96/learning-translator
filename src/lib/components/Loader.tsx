@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Footer } from './Footer'
 
 type LoaderProps = {
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 
 export const Loader: React.FunctionComponent<LoaderProps> = (

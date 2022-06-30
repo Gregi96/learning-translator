@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Language, LanguageCode } from 'lib/models'
+import { AutoDetectedLanguage, Language, LanguageCode } from 'lib/models'
 import { APP_CONFIG } from 'lib/config'
 
 export const useSupportedLanguages = (
@@ -44,4 +44,48 @@ export const useSupportedLanguages = (
                 })
         }
     }
+}
+
+export const useAutoDetectLanguage = (onSuccess: (autoDetectedLanguage: AutoDetectedLanguage) => void) => {
+    const [isLoading, setIsLoading] = useState(false)
+    const [hasError, setHasError] = useState(false)
+
+    useEffect(() => {
+        console.log("component update")
+    }, [])
+
+    return {
+        isLoading,
+        hasError,
+        fetch: (query: string) => {
+            setIsLoading(true)
+            setHasError(false)
+            fetch(`${APP_CONFIG.API_URL}/detect`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    q: query
+                }),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response
+                    }
+                    throw  response
+                })
+                .then(response => response.json())
+                .then(([autoDetectedLanguage]) => onSuccess(autoDetectedLanguage))
+                .catch(() => {
+                    setHasError(true)
+                })
+                .finally(() => {
+                    setIsLoading(false)
+                })
+        }
+    }
+
+
+
 }
