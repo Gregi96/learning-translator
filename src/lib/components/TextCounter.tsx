@@ -1,10 +1,19 @@
+import React from 'react'
 import styled from 'styled-components'
 
-export const TextCounter = () => {
+type TextCounterProps = {
+    countOfLetters: number,
+    limit: number
+}
+
+export const TextCounter: React.FunctionComponent<TextCounterProps> = ({
+    countOfLetters,
+    limit
+}) => {
 
     return (
         <Counter>
-            2/5000
+            {countOfLetters}/{limit}
         </Counter>
     )
 }

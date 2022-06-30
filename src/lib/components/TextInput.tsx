@@ -1,8 +1,41 @@
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
-export const TextInput = () => {
+type TextInputProps = {
+    disabled?: boolean,
+    autoFocus?: boolean,
+    placeholder?: string,
+    value?: string,
+    onChangeText?(newQuery: string): void
+}
+
+export const TextInput: React.FunctionComponent<TextInputProps> = ({
+    autoFocus,
+    disabled,
+    placeholder,
+                                                                       value,
+    onChangeText
+ }) => {
+    const InputRef = useRef<HTMLTextAreaElement>(null)
+
+    useEffect(() => {
+        if (!disabled && autoFocus && InputRef.current) {
+            InputRef.current.focus()
+        }
+    }, [])
+
     return (
-        <Input placeholder="type text here..."/>
+        <Input
+            value={value}
+            placeholder={disabled ? undefined : placeholder}
+            disabled={disabled}
+            ref={InputRef}
+            onChange={(event) => {
+                if (onChangeText) {
+                    onChangeText(event.target.value)
+                }
+            }}
+        />
     )
 }
 
