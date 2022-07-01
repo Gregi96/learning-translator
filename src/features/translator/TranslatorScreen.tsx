@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useTranslations } from 'lib/hooks'
+import { useTranslations, useFetch } from 'lib/hooks'
 import { Confidence, Loader, SelectLanguage, TextCounter, TextInput } from 'lib/components'
 import { ExchangeLanguage } from 'lib/components/ExchangeLanguage'
 import { AutoDetectedLanguage, Language, LanguageCode } from 'lib/models'
@@ -8,6 +8,7 @@ import { SelectedLanguages } from './types'
 import { APP_CONFIG } from 'lib/config'
 import { useAutoDetectLanguage, useTranslateText } from './actions'
 import { useDebouncedCallback } from 'use-debounce';
+import { useLibreTranslate } from './useLibreTranslate'
 
 type TranslatorScreenProps = {
     languages: Array<Language>
@@ -17,31 +18,21 @@ export const TranslatorScreen: React.FunctionComponent<TranslatorScreenProps> = 
     languages
 }) => {
     const T = useTranslations()
-    const [translatedText, setTranslatedText] = useState('')
-    const [query, setQuery] = useState('')
-    const [autoDetectedLanguage, setAutoDetectedLanguage] = useState<AutoDetectedLanguage>()
-    const [selectedLanguages, setSelectedLanguages] = useState<SelectedLanguages>({
-        source: LanguageCode.Polish,
-        target: LanguageCode.English
-    })
-    const {
-        isLoading: isDetectingLanguage,
-        hasError: hasErrorDetectingLanguage,
-        fetch: autoDetectLanguage
-    } = useAutoDetectLanguage(setAutoDetectedLanguage)
-    const {isLoading: isTranslatingText, hasError: hasErrorTranslatingText, fetch: translateText} = useTranslateText(setTranslatedText)
-    const debouncedAction = useDebouncedCallback(
-        debouncedQuery => {
-            if (debouncedQuery.length < 5) {
-                return
-            }
 
-            selectedLanguages.source === LanguageCode.Auto
-                ? autoDetectLanguage(debouncedQuery)
-                : translateText(debouncedQuery, selectedLanguages)
-        },
-        1000
-    )
+    const {
+        selectedLanguages,
+        setSelectedLanguages,
+        query,
+        setQuery,
+        debouncedAction,
+        isDetectingLanguage,
+        hasErrorTranslatingText,
+        hasErrorDetectingLanguage,
+        autoDetectedLanguage,
+        setAutoDetectedLanguage,
+        translatedText,
+        isTranslatingText
+    } = useLibreTranslate()
 
     return (
         <Container>
